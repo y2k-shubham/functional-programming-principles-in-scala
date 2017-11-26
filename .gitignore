@@ -1,0 +1,17 @@
+target
+*.class
+*.log
+
+*.ipr
+*.iws
+*.iml
+out
+
+.idea
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/dictionaries
+.idea/libraries
+
+.DS_Store
