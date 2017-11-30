@@ -9,9 +9,9 @@ object curry {
   /**
     *
     * @param op operation function decides type of
-    *           operation to perform over range (addition / product)
+    *           operation to perform over range (addition / multiplication)
     * @param u termination value of recursion
-    *          (0 for sum, 1 for product)
+    *          (0 for sum, 1 for multiplication)
     * @param f transformation to be applied to each value of range
     *          before performing op operation over the range
     * @param a starting value of range
