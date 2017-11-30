@@ -1,4 +1,13 @@
-class Rational(protected val num: Int, protected val den: Int) {
+class Rational(private val _num: Int, private val _den: Int) {
+  require(_den != 0, "denominator can't be zero")
+
+  private val _hcf = Rational.hcf(_num, _den)
+  private val _sign = if (_den < 0) -1 else 1
+  protected val num = _sign * _num / _hcf
+  protected val den = math.abs(_den) / _hcf
+
+  def this(_num: Int) = this(_num, 1)
+
   def reciprocal: Rational = Rational.reciprocalling(this)
   def invert: Rational = Rational.inversion(this)
   def reduce: Rational = Rational.reduction(this)
@@ -9,7 +18,11 @@ class Rational(protected val num: Int, protected val den: Int) {
   def multiply(f: Rational): Rational = Rational.multiplication(this, f)
   def divide(f: Rational): Rational = Rational.division(this, f)
 
+  def toDecimal: Double = Rational.decimal(this)
   def equals(f: Rational): Boolean = Rational.areEqual(this, f)
+  def isBigger(f: Rational): Boolean = {
+    Rational.decimal(this) > Rational.decimal(f)
+  }
 
   def show(): Unit = println(this.toString)
   override def toString: String = s"$num/$den"
@@ -18,13 +31,15 @@ class Rational(protected val num: Int, protected val den: Int) {
 object Rational {
 
   def hcf(a: Int, b: Int): Int = {
-    if (a < b) hcf(b, a)
+    if (a == 0 || b == 0) return 1
+    if (a < 0 || b < 0) return hcf(math.abs(a), math.abs(b))
+    if (a < b) return hcf(b, a)
 
     if (a % b == 0) b
     else hcf(b, a % b)
   }
   def lcm(a: Int, b: Int): Int = {
-    (a * b) / hcf(a, b)
+    math.abs((a * b) / hcf(a, b))
   }
 
   def reciprocalling(f: Rational): Rational = {
@@ -67,24 +82,39 @@ object Rational {
 
     (f1Red.num == f2Red.num) && (f1Red.den == f2Red.den)
   }
+
+  def max(f1: Rational, f2: Rational): Rational = {
+    val f11: Double = decimal(f1)
+    val f22: Double = decimal(f2)
+
+    if (f11 > f22) new Rational(f1.num, f1.den)
+    else new Rational(f2.num, f2.den)
+  }
+
+  def decimal(f: Rational): Double = {
+    f.num.toDouble / f.den
+  }
 }
 
-val f1 = new Rational(2, 3)
+val f1 = new Rational(4, 3)
 val f2 = new Rational(5, 17)
+val f3 = new Rational(15, 7)
+val f4 = new Rational(-4, 16)
 
-f1.
-  add(f2).
-  add(
-    f2.
-      multiply(f1).
-      divide(
-        f1.add(f1)
-      )
-  ).subtract(f1).
-  subtract(f2)
+val f5 = new Rational(-17, 10)
+val f6 = new Rational(-17, -10)
+val f7 = new Rational(17, -10)
 
-Rational.hcf(16, 6)
-Rational.hcf(16, 64)
+val f8 = new Rational(4)
 
-Rational.lcm(5, 16)
-Rational.lcm(52, 16)
+f1.reciprocal
+f1.invert
+
+f1.subtract(f2)
+f1.add(f2).add(f1.add(f1)).multiply(f2).divide(f1).subtract(f2)
+
+Rational.max(f3, f4)
+Rational.decimal(f3)
+f4.toDecimal
+
+f2.isBigger(f1)
