@@ -1,6 +1,7 @@
 abstract class IntSet {
   def contains(x: Int): Boolean
   def include(x: Int): IntSet
+  def union(otherSet: IntSet): IntSet
 }
 
 /**
@@ -11,6 +12,8 @@ object Empty extends IntSet {
   override def contains(x: Int): Boolean = false
 
   override def include(x: Int): IntSet = new NonEmpty(x, Empty, Empty)
+
+  override def union(otherSet: IntSet): IntSet = otherSet
 
   override def toString: String = "."
 }
@@ -27,6 +30,8 @@ class NonEmpty(ele: Int, left: IntSet, right: IntSet) extends IntSet {
     else if (x > ele) new NonEmpty(ele, left, right include x)
     else this
   }
+
+  override def union(otherSet: IntSet): IntSet = ((left union right) union otherSet) include ele
 
   override def toString: String = "{" + left + ele + right + "}"
 }
