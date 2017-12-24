@@ -15,3 +15,11 @@ commonSourcePackages += "common"
 
 courseId := "bRPXgjY9EeW6RApRXdjJPw"
 
+// for office task
+libraryDependencies += "com.springml" % "spark-sftp_2.11" % "1.1.1"
+
+libraryDependencies ++= Seq(
+  "org.apache.spark" %% "spark-core" % "2.2.0",
+  "org.apache.spark" %% "spark-sql" % "2.2.0",
+  "org.apache.spark" %% "spark-catalyst" % "2.2.0"
+)

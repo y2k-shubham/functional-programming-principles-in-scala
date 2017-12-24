@@ -5,7 +5,7 @@ abstract class IntSet {
 }
 
 /**
-  * changed from object to class to ensure that
+  * changed from class to object to ensure that
   * only a single instance of Empty is
   */
 object Empty extends IntSet {
@@ -31,13 +31,14 @@ class NonEmpty(ele: Int, left: IntSet, right: IntSet) extends IntSet {
     else this
   }
 
-  override def union(otherSet: IntSet): IntSet = ((left union right) union otherSet) include ele
+  override def union(otherSet: IntSet): IntSet =
+    ((left union right) union otherSet) include ele
 
   override def toString: String = "{" + left + ele + right + "}"
 }
 
 println("Welcome to Scala worksheet")
-val t1 = new NonEmpty(1, Empty, Empty)
-val t2 = Empty
-val t3 = t1 include 2
-val t4 = t3 include 5
+val t1: IntSet = new NonEmpty(1, Empty, Empty)
+val t2: IntSet = Empty
+val t3: IntSet = t1 include 2
+val t4: IntSet = t3 include 5

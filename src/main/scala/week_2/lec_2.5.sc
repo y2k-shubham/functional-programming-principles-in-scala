@@ -23,6 +23,10 @@ class Rational(private val _num: Int, private val _den: Int) {
   def isBigger(f: Rational): Boolean = {
     Rational.decimal(this) > Rational.decimal(f)
   }
+  // isLesser can be renamed to <
+  def isLesser(f: Rational): Boolean = {
+    Rational.decimal(this) < Rational.decimal(f)
+  }
 
   def show(): Unit = println(this.toString)
   override def toString: String = s"$num/$den"
@@ -90,6 +94,13 @@ object Rational {
     if (f11 > f22) new Rational(f1.num, f1.den)
     else new Rational(f2.num, f2.den)
   }
+  def min(f1: Rational, f2: Rational): Rational = {
+    val f11: Double = decimal(f1)
+    val f22: Double = decimal(f2)
+
+    if (f11 < f22) new Rational(f1.num, f1.den)
+    else new Rational(f2.num, f2.den)
+  }
 
   def decimal(f: Rational): Double = {
     f.num.toDouble / f.den
@@ -114,7 +125,9 @@ f1.subtract(f2)
 f1.add(f2).add(f1.add(f1)).multiply(f2).divide(f1).subtract(f2)
 
 Rational.max(f3, f4)
+Rational.min(f3, f4)
 Rational.decimal(f3)
 f4.toDecimal
 
 f2.isBigger(f1)
+f2 isLesser f1
