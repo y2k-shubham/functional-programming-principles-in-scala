@@ -23,6 +23,24 @@ object Expr {
       eval(eSum.leftOp) + eval(eSum.rightOp)
     } else throw new Error(s"Unknown Expression: $e")
   }
+
+  /*
+  Can also be written as
+  def eval4(e: Expr): Int = e match {
+    case Number(n) => n
+    case Sum(e1, e2) => eval(e1) + eval(e2)
+    case _ => throw new Error(s"Unknown Expression: $e")
+  }
+
+  If no expression matches, we get MatchError
+  To overcome it, case _ as added
+  */
+  def eval4(e: Expr): Int = e match {
+    case number: Number => number.numValue
+    case eSum: Sum =>
+      eval(eSum.leftOp) + eval(eSum.rightOp)
+    case _ => throw new Error(s"Unknown Expression: $e")
+  }
 }
 
 class Number(n: Int) extends Expr {
