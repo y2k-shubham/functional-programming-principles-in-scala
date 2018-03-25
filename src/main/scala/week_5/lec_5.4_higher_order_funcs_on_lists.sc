@@ -84,6 +84,79 @@ trait List[T] {
       }
     }
   }
+
+  def map(f: T => T): List[T] = map(this)(f)
+
+  private def map(list: List[T])(f: T => T): List[T] = {
+    if (list.isEmpty) list
+    else new NonEmpty[T](f(list.head), map(list.tail)(f))
+  }
+
+  def transform[U](f: T => U): List[U] = transform[U](this)(f)
+
+  private def transform[U](list: List[T])(f: T => U): List[U] = {
+    if (list.isEmpty) new Nil[U]
+    else new NonEmpty[U](f(list.head), transform[U](list.tail)(f))
+  }
+
+  def filter(f: T => Boolean): List[T] = filter(this)(f)
+
+  private def filter(list: List[T])(f: T => Boolean): List[T] = {
+    if (list.isEmpty) list
+    else if (f(list.head)) new NonEmpty[T](list.head, filter(list.tail)(f))
+    else filter(list.tail)(f)
+  }
+
+  def filterNot(f: T => Boolean): List[T] = filterNot(this)(f)
+
+  private def filterNot(list: List[T])(f: T => Boolean): List[T] = {
+    if (list.isEmpty) list
+    else if (f(list.head)) filterNot(list.tail)(f)
+    else new NonEmpty[T](list.head, filterNot(list.tail)(f))
+  }
+
+  def partition(f: T => Boolean): (List[T], List[T]) = (filter(this)(f), filterNot(this)(f))
+
+  def takeWhile(f: T => Boolean): List[T] = takeWhile(this)(f)
+
+  private def takeWhile(list: List[T])(f: T => Boolean): List[T] = {
+    if (list.isEmpty) list
+    else if (f(list.head)) new NonEmpty[T](list.head, takeWhile(list.tail)(f))
+    else new Nil[T]
+  }
+
+  def dropWhile(f: T => Boolean): List[T] = dropWhile(this)(f)
+
+  private def dropWhile(list: List[T])(f: T => Boolean): List[T] = {
+    if (list.isEmpty) list
+    else if (f(list.head)) dropWhile(list.tail)(f)
+    else new NonEmpty[T](list.head, list.tail)
+  }
+
+  def span(f: T => Boolean): (List[T], List[T]) = (takeWhile(f), dropWhile(f))
+
+  def pack(f: (T, T) => Boolean): List[List[T]] = packUtil(this)(f)
+
+  private def packUtil(list: List[T])(f: (T, T) => Boolean): List[List[T]] = {
+    if (list.isEmpty) new Nil[List[T]]
+    else {
+      val nonEmptyList: NonEmpty[T] = list.asInstanceOf[NonEmpty[T]]
+      def g(t1: T)(t2: T): Boolean = f(t1, t2)
+
+      val (fPart, sPart): (List[T], List[T]) = nonEmptyList.span(g(nonEmptyList.head))
+      new NonEmpty[List[T]](fPart, packUtil(sPart)(f))
+    }
+  }
+
+  def encode(f: (T, T) => Boolean): List[(T, Int)] = {
+    if (isEmpty) new Nil[(T, Int)]
+    else {
+      val packedList: List[List[T]] = pack(f)
+      packedList.transform[(T, Int)] { (list: List[T]) =>
+        (list.head, list.length)
+      }
+    }
+  }
 }
 
 class Nil[T] extends List[T] {
@@ -144,7 +217,9 @@ class NonEmpty[T](override val head: T, override val tail: List[T]) extends List
   }
 }
 
-class NonEmptyInt(override val head: Int, override val tail: List[Int]) extends NonEmpty[Int](head, tail)
+class NonEmptyInt(override val head: Int, override val tail: List[Int]) extends NonEmpty[Int](head, tail) {
+  def squareList: List[Int] = map(x => x * x)
+}
 
 val nil: List[Int] = NilInt
 nil.isEmpty
@@ -180,16 +255,45 @@ l_5_7_3.sorted(x => x)
 //l_1_5.remove(2)
 //l_5_7_3.remove(2)
 
-l_3.length
-l_5_7_3.length
-nil.length
+//l_3.length
+//l_5_7_3.length
+//nil.length
+//
+//l_3.splitN(0)
+//l_3.splitN(1)
+//l_7_3.splitN(1)
+//l_5_7_3.splitN(2)
+//
+//l_1_5.merge(x => x)(l_5_7_3.sorted(x => x))
+//l_7_3.sorted(x => x).merge(x => x)(l_1_5).merge(x => x)(l_3)
+//
+//l_5_7_3.concat(l_1_5).mergeSort(x => x)
 
-l_3.splitN(0)
-l_3.splitN(1)
-l_7_3.splitN(1)
-l_5_7_3.splitN(2)
+l_5_7_3.map(x => 2 * x)
+l_5_7_3.asInstanceOf[NonEmptyInt].squareList
 
-l_1_5.merge(x => x)(l_5_7_3.sorted(x => x))
-l_7_3.sorted(x => x).merge(x => x)(l_1_5).merge(x => x)(l_3)
+l_5_7_3.filter(_ > 4)
+l_5_7_3.filter(_ > 10)
 
-l_5_7_3.concat(l_1_5).mergeSort(x => x)
+l_5_7_3.filterNot(_ > 4)
+l_5_7_3.filterNot(_ > 10)
+
+l_5_7_3.partition(_ > 4)
+l_5_7_3.partition(_ < 0)
+
+l_5_7_3.takeWhile(_ > 4)
+l_5_7_3.takeWhile(_ < 4)
+
+l_5_7_3.dropWhile(_ > 4)
+l_5_7_3.dropWhile(_ < 4)
+
+l_5_7_3.span(_ >= 5)
+
+val l_5_5_7_3 = new NonEmptyInt(5, l_5_7_3)
+val l_3_5_5_7_3 = new NonEmptyInt(3, l_5_5_7_3)
+val l_3_3_5_5_7_3 = new NonEmptyInt(3, l_3_5_5_7_3)
+val l_7_3_3_5_5_7_3 = new NonEmptyInt(7, l_3_3_5_5_7_3)
+
+l_7_3_3_5_5_7_3.dropWhile(_ != 5)
+l_7_3_3_5_5_7_3.pack((x, y) => x == y)
+l_7_3_3_5_5_7_3.encode((x, y) => x == y)
