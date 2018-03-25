@@ -41,6 +41,7 @@ object test {
   def isPrime2(n: Int): Boolean = {
     (1 to n).count(n % _ == 0) == 2
   }
+  isPrime1(17)
   isPrime1(13)
   isPrime2(12)
 }
