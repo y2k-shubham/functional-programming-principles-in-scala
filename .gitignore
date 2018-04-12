@@ -1,6 +1,7 @@
 target
 *.class
 *.log
+*.zip
 
 *.ipr
 *.iws
